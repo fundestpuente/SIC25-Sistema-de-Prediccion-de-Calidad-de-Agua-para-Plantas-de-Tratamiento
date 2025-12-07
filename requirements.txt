@@ -9,3 +9,4 @@ streamlit>=1.51.0
 python-telegram-bot>=22.0
 python-dotenv>=1.2.0
 joblib>=1.5.0
+plotly>=6.3.0
