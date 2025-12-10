@@ -11,5 +11,6 @@ venv/
 env/
 
 # Seguridad
+telegram_connection.json
 .env
 telegram_config.py

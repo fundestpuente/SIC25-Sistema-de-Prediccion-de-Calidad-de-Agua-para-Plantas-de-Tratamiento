@@ -1,8 +1,31 @@
 import streamlit as st
+import threading
 import pandas as pd
 import joblib
 import numpy as np
 import plotly.graph_objects as go
+import json # <--- AGREGAR ESTO
+import sys
+import os
+
+# Añadir src al path para poder importar
+sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+from src.telegram_bot import send_telegram_alert, run_listener
+
+@st.cache_resource
+def iniciar_bot_en_background():
+    """
+    Esta función crea un hilo secundario para correr el bot.
+    Al usar @st.cache_resource, Streamlit asegura que esto solo se ejecute
+    UNA vez al arrancar la app, evitando duplicar bots.
+    """
+    # Creamos el hilo apuntando a la función run_listener
+    bot_thread = threading.Thread(target=run_listener, daemon=True)
+    bot_thread.start()
+    return bot_thread
+
+# Llamamos a la función inmediatamente
+iniciar_bot_en_background()
 
 # Configuración inicial
 st.set_page_config(
@@ -92,7 +115,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-import os
+
 
 # Configuración de rutas
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -168,6 +191,30 @@ def user_input_features():
 
 input_df = user_input_features()
 
+st.sidebar.markdown('---')
+with st.sidebar.expander("🔔 Conectar Alertas", expanded=True):
+    # Enlace directo a tu bot
+    bot_name = "TU_BOT_NAME_AQUI" # Pon el nombre real de tu bot sin @
+    st.markdown(f"1. [Abrir Bot en Telegram](https://t.me/{bot_name}) y dar **/start**")
+    
+    if st.button("🔄 Sincronizar con Bot"):
+        try:
+            with open("telegram_connection.json", "r") as f:
+                data = json.load(f)
+            
+            # Guardar en sesión
+            st.session_state['tg_id'] = data['chat_id']
+            st.session_state['tg_name'] = data['name']
+            st.success(f"Conectado: {data['name']}")
+        except FileNotFoundError:
+            st.warning("Primero ve a Telegram y usa /start")
+            
+    # Estado actual
+    if 'tg_id' in st.session_state:
+        st.caption(f"✅ Enviando a: {st.session_state['tg_name']}")
+    else:
+        st.caption("🔴 No conectado")
+        
 # Botones de la barra lateral
 # st.sidebar.markdown('---')
 analyze_button = st.sidebar.button("Analizar Muestra o CSV  ", type="primary")
@@ -222,6 +269,42 @@ if analyze_button and model:
     prediction = model.predict(input_scaled)[0]
     proba = model.predict_proba(input_scaled)[0]
     confidence = proba[prediction] * 100
+    
+    # --- SISTEMA DE ALERTAS INTEGRADO ---
+    trigger = False
+    reasons = []
+    
+    # 1. Criterio IA
+    if prediction == 0: # 0 = No Potable
+        trigger = True
+        reasons.append(f"IA detectó riesgo (Confianza: {confidence:.1f}%)")
+        
+    # 2. Criterio Normativo (pH)
+    ph_val = input_df['ph'].iloc[0]
+    if ph_val < 6.5 or ph_val > 8.5:
+        trigger = True
+        reasons.append(f"pH fuera de norma ({ph_val:.1f})")
+
+    # 3. Disparo de Alerta
+    if trigger:
+        # Recuperar ID de la sesión
+        chat_id = st.session_state.get('tg_id')
+        
+        if chat_id:
+            msg = (
+                f"🚨 *ALERTA DE CALIDAD DE AGUA*\n\n"
+                f"**Motivos:** {', '.join(reasons)}\n"
+                f"**Muestra:** pH {ph_val:.1f}"
+            )
+            # Llamamos a la función que importamos de src/telegram_bot.py
+            ok, status = send_telegram_alert(msg, chat_id)
+            
+            if ok:
+                st.toast(f"Alerta enviada a {st.session_state['tg_name']}", icon="📲")
+            else:
+                st.error(f"Fallo Telegram: {status}")
+        else:
+            st.warning("⚠️ Riesgo detectado, pero no has sincronizado el Bot.")
     
     # Mostrar resultados con diseño del mockup
     if prediction == 1:
