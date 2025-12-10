@@ -29,7 +29,7 @@ iniciar_bot_en_background()
 
 # Configuración inicial
 st.set_page_config(
-    page_title="Water Potability Prediction Dashboard",
+    page_title="SIPCA",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -149,8 +149,8 @@ st.sidebar.markdown("""
         <span class="material-symbols-outlined" style="font-size: 24px;">water_drop</span>
     </div>
     <div>
-        <h1 style="margin: 0; font-size: 1.125rem; font-weight: bold; color: var(--text-primary);">Water Potability</h1>
-        <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">Prediction Dashboard</p>
+        <h1 style="margin: 0; font-size: 1.125rem; font-weight: bold; color: var(--text-primary);">SIPCA</h1>
+        <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">Predicción de la potabilidad del agua</p>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -159,21 +159,21 @@ st.sidebar.markdown('---')
 # Definir los sliders con valores realistas o promedio
 def user_input_features():
     """Función para capturar los inputs del usuario a través de sliders"""
-    st.sidebar.markdown('### Input Parameters')
+    st.sidebar.markdown('### Parámetros de la Muestra')
     
     # Agrupar parámetros para ahorrar espacio
-    with st.sidebar.expander("Basic Parameters", expanded=True):
+    with st.sidebar.expander("Parámetros Básicos", expanded=True):
         ph = st.slider('pH', 0.0, 14.0, 7.0, 0.1)
-        hardness = st.slider('Hardness (mg/L)', 50.0, 350.0, 196.0, 1.0)
-        solids = st.slider('Solids (ppm)', 300.0, 60000.0, 22000.0, 100.0)
-        chloramines = st.slider('Chloramines (ppm)', 0.0, 14.0, 7.1, 0.1)
+        hardness = st.slider('Dureza (mg/L)', 50.0, 350.0, 196.0, 1.0)
+        solids = st.slider('Sólidos (ppm)', 300.0, 60000.0, 22000.0, 100.0)
+        chloramines = st.slider('Cloraminas (ppm)', 0.0, 14.0, 7.1, 0.1)
 
-    with st.sidebar.expander("Advanced Parameters", expanded=False):
-        sulfate = st.slider('Sulfate (mg/L)', 100.0, 500.0, 333.0, 1.0)
-        conductivity = st.slider('Conductivity (µS/cm)', 100.0, 800.0, 420.0, 1.0)
-        organic_carbon = st.slider('Organic Carbon (ppm)', 0.0, 30.0, 14.5, 0.1)
-        trihalomethanes = st.slider('Trihalomethanes', 0.0, 125.0, 66.0, 0.1)
-        turbidity = st.slider('Turbidity', 1.0, 7.0, 3.9, 0.1)
+    with st.sidebar.expander("Parámetros Avanzados", expanded=False):
+        sulfate = st.slider('Sulfato (mg/L)', 100.0, 500.0, 333.0, 1.0)
+        conductivity = st.slider('Conductividad (µS/cm)', 100.0, 800.0, 420.0, 1.0)
+        organic_carbon = st.slider('Carbono Orgánico (ppm)', 0.0, 30.0, 14.5, 0.1)
+        trihalomethanes = st.slider('Trihalometanos', 0.0, 125.0, 66.0, 0.1)
+        turbidity = st.slider('Turbidez', 1.0, 7.0, 3.9, 0.1)
 
     data = {
         'ph': ph,
@@ -217,11 +217,11 @@ with st.sidebar.expander("🔔 Conectar Alertas", expanded=True):
         
 # Botones de la barra lateral
 # st.sidebar.markdown('---')
-analyze_button = st.sidebar.button("Analizar Muestra o CSV  ", type="primary")
+analyze_button = st.sidebar.button("Analizar Muestra", type="primary")
 st.sidebar.button("Restablecer Parámetros", type="secondary")
 
 # Área principal
-st.title("Dashboard")
+# st.title("Dashboard")
 
 # Bloque de análisis por lotes con icono Material Symbols
 with st.container(border=True):
@@ -230,7 +230,7 @@ with st.container(border=True):
         st.markdown('<span class="material-symbols-outlined" style="font-size: 32px; color: #0c67a3;">csv</span>', unsafe_allow_html=True)
     with col_text:
         st.markdown("### Análisis por lotes")
-        st.caption("Sube un archivo CSV para realizar predicciones masivas. (Asegúrate de que las columnas coincidan con las esperadas.)")
+        st.caption("Sube un archivo CSV para realizar predicciones masivas. (Asegúrate de que las columnas coincidan con las esperadas a la muestra.)")
     
     csv_file = st.file_uploader(" ", type=["csv"], label_visibility="collapsed")
 
@@ -333,20 +333,20 @@ if analyze_button and model:
     
     # Gráfico1: Importancia de características
     with col_feat_imp:
-        st.subheader("Feature Importance")
+        st.subheader("Importancia de Características")
         
         importance_values = [0.25, 0.19, 0.10, 0.09, 0.085, 0.08, 0.075, 0.07, 0.07]  # Valores ficticios de importancia
         df_imp = pd.DataFrame({
-            'Feature': FEATURES_IMPORTANCE_ORDER,
-            'Importance': importance_values
-        }).sort_values(by='Importance', ascending=True)
+            'Característica': FEATURES_IMPORTANCE_ORDER,
+            'Importancia': importance_values
+        }).sort_values(by='Importancia', ascending=True)
         
         # Gráfico de barras horizontales con color accent del diseño
-        st.bar_chart(df_imp, x='Importance', y='Feature', color='#11a4d4', height=400)
+        st.bar_chart(df_imp, x='Importancia', y='Característica', color='#11a4d4', height=400)
 
     # Gráfico Radar Chart
     with col_radar:
-        st.subheader("Sample vs Safe Averages")
+        st.subheader("Muestra vs Promedios Seguros")
         
         # Valores promedios seguros estimados para la comparación
         safe_avg_values = {
@@ -369,7 +369,7 @@ if analyze_button and model:
             r=sample_values,
             theta=categories,
             fill='toself',
-            name='Your Sample',
+            name='Tu Muestra',
             line_color='#11a4d4',
             fillcolor='rgba(17, 164, 212, 0.4)'
         ))
@@ -379,7 +379,7 @@ if analyze_button and model:
             r=safe_values,
             theta=categories,
             fill='none',
-            name='Safe Average',
+            name='Promedios Seguros',
             line=dict(dash='dot', color='#4ade80')
         ))
         
