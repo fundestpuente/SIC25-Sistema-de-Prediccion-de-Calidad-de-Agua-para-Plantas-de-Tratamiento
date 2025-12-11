@@ -77,7 +77,12 @@ def run_listener():
     
     print("🤖 Bot de Alertas ESCUCHANDO... (Presiona Ctrl+C para detener)")
     print(f"Esperando comando /start para guardar ID en '{SHARED_FILE}'...")
-    app.run_polling()
+    
+    app.run_polling(
+        drop_pending_updates=True,
+        allowed_updates=Update.ALL_TYPES,
+        stop_signals=None  # Deshabilitar manejo de señales para threads
+    )
 
 # ==========================================
 # PUNTO DE ENTRADA PRINCIPAL
