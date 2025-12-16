@@ -11,6 +11,7 @@ import os
 # Añadir src al path para poder importar
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 from src.telegram_bot import send_telegram_alert, run_listener
+from src.chatbot_llm import create_chatbot_widget
 
 @st.cache_resource
 def iniciar_bot_en_background():
@@ -395,3 +396,6 @@ if analyze_button and model:
             plot_bgcolor='rgba(0,0,0,0)',
         )
         st.plotly_chart(fig, width="stretch")
+
+# Widget del Chatbot LLM (Flotante en la esquina inferior derecha)
+create_chatbot_widget()

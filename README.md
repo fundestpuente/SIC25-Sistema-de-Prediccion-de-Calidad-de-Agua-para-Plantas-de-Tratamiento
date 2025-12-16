@@ -24,6 +24,7 @@ La solución incluye un **dashboard interactivo desarrollado en Streamlit** que 
 - Cargar archivos CSV para realizar predicciones masivas (por lotes).
 - Visualizar la importancia de las características y comparar la muestra con promedios seguros.
 - **Recibir alertas en tiempo real vía Telegram** cuando se detectan niveles de riesgo o agua no potable.
+- **🤖 Consultar con un Asistente IA** especializado en calidad de agua que responde preguntas técnicas sobre parámetros, normativas y recomendaciones (soporta OpenAI GPT, Google Gemini y Anthropic Claude).
 
 ---
 
@@ -80,6 +81,29 @@ La solución incluye un **dashboard interactivo desarrollado en Streamlit** que 
    - La predicción indica que el agua es **NO POTABLE**.
    - El **pH** se encuentra fuera del rango seguro (6.5 - 8.5).
 
+
+---
+
+## 🤖 Asistente IA de Calidad de Agua
+
+El sistema incluye un chatbot inteligente que puede responder preguntas sobre:
+- Parámetros de calidad de agua y sus valores seguros
+- Interpretación de resultados de análisis
+- Normativas y estándares (OMS, EPA)
+- Recomendaciones técnicas y procedimientos
+
+### Proveedores Soportados:
+- **OpenAI (GPT-3.5/GPT-4)** - Respuestas precisas y rápidas
+- **Google Gemini** - ⭐ GRATIS, sin tarjeta de crédito
+- **Anthropic (Claude)** - Excelente para explicaciones técnicas
+
+### Configuración Rápida:
+1. Obtén una API key de tu proveedor preferido 
+2. En la app, ve a la barra lateral → "🤖 Asistente IA"
+3. Selecciona tu proveedor e ingresa tu API key
+4. ¡Empieza a hacer preguntas!
+
+
 ---
 
 ## 📂 Estructura del Código
@@ -104,10 +128,13 @@ SIC25-Sistema-de-Prediccion-de-Calidad-de-Agua-para-Plantas-de-Tratamiento/
 │   ├── model_train.py          # Script de entrenamiento
 │   ├── preprocessing.py        # Funciones de preprocesamiento
 │   ├── telegram_bot.py         # Bot de notificaciones y alertas
+│   ├── chatbot_llm.py          # 🆕 Chatbot IA con LLM (OpenAI/Google/Anthropic)
 │   └── test_data.py            # Generación de datos de prueba
 │
 ├── app.py                      # Aplicación principal (Dashboard Streamlit)
 ├── requirements.txt            # Dependencias del proyecto
+├── .env.example                # 🆕 Plantilla de variables de entorno
+├── CHATBOT_GUIDE.md            # 🆕 Guía completa del chatbot IA
 └── README.md                   # Documentación del proyecto
 ```
 
